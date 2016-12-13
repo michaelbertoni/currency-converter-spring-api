@@ -1,14 +1,15 @@
 package com.currencyconverter.api.entity;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 public class Rates {
 	
 	private final String base;
-	private final String date;
+	private final LocalDate date;
 	private final Map<String, Float> rates;
 	
-	public Rates(String base, String date, Map<String, Float> rates) {
+	public Rates(String base, LocalDate date, Map<String, Float> rates) {
 		super();
 		this.base = base;
 		this.date = date;
@@ -18,7 +19,7 @@ public class Rates {
 	public String getBase() {
 		return base;
 	}
-	public String getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 	public Map<String, Float> getRates() {
