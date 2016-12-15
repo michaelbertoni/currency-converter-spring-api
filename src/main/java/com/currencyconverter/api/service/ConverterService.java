@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -29,31 +30,69 @@ import com.google.gson.JsonParser;
 public class ConverterService {
 	
 	private String url = "http://api.fixer.io/latest";
+	private DecimalFormat decimalFormat = new DecimalFormat("#.#####");
+	private String result;
 	
-	public Float convertCurrency(String currencyFrom, String currencyTo, Float valueFrom) {
-		Rates rates;
+	public String convertCurrency(String currencyFrom, String currencyTo, Double valueFrom) {
+		Rates rates = null;
 		try {
 			rates = readRates();
-			
-			
-			if (currencyFrom.equals(rates.getBase())) {
-				return valueFrom * rates.getRates().get(currencyTo);
-			}
-			
-			if (currencyTo.equals(rates.getBase())) {
-				return valueFrom / rates.getRates().get(currencyFrom);
-			}
-			
-			return valueFrom * (rates.getRates().get(currencyTo) / rates.getRates().get(currencyFrom));
 		} catch (IOException e) {
-			e.printStackTrace();
+			return "Erreur d'entrée/sortie : " + e;
 		}
-		return null;
+		
+		if (valueFrom <= 0) {
+			return "La valeur de départ doit être supérieure à zéro.";
+		}
+		
+		if (currencyFrom.equals(currencyTo)) {
+			return "La devise de départ doit être différente de la devise d'arrivée.";
+		}
+		
+		if (currencyFrom.equals(rates.getBase())) {
+			result = decimalFormat.format(valueFrom * rates.getRates().get(currencyTo));
+		}
+		
+		if (currencyTo.equals(rates.getBase())) {
+			result = decimalFormat.format(valueFrom / rates.getRates().get(currencyFrom));
+		}
+		
+		if (!currencyTo.equals(rates.getBase()) && !currencyFrom.equals(rates.getBase())) {
+			result = decimalFormat.format(valueFrom * (rates.getRates().get(currencyTo) / rates.getRates().get(currencyFrom)));
+		}
+		
+		return result;
+		
+	}
+	
+	public Rates readRates() throws IOException {
+		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
+			@Override
+			public LocalDate deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+					throws JsonParseException {
+				String dateString = json.getAsString();
+				DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				return LocalDate.parse(dateString, dtf);
+			}
+		}).create();
+		
+		try (Reader reader = new FileReader("rates.json")) {
+			Rates rates = gson.fromJson(reader, Rates.class);
+			if (rates.getDate().isBefore(LocalDate.now())) {
+				getLastRates();
+				return readRates();
+			}
+			return rates;
+		} catch (IOException e) {
+			getLastRates();
+			return readRates();
+		}
 	}
 	
 	public JsonElement readJsonFromUrl(String requestUrl) throws IOException {
 		URL url = new URL(requestUrl);
-		HttpURLConnection request = (HttpURLConnection) url.openConnection();
+		HttpURLConnection request;
+		request = (HttpURLConnection) url.openConnection();
 		request.connect();
 		JsonParser jp = new JsonParser();
 		return jp.parse(new InputStreamReader((InputStream) request.getContent()));
@@ -61,7 +100,8 @@ public class ConverterService {
 	
 	public void getLastRates() throws IOException {
 		Gson gson = new Gson();
-		JsonElement jsonElement = readJsonFromUrl(this.url);
+		JsonElement jsonElement;
+		jsonElement = readJsonFromUrl(url);
 		File jsonFile = new File("rates.json");
 		if (!jsonFile.exists()) {
 			jsonFile.createNewFile();
@@ -71,28 +111,4 @@ public class ConverterService {
 		writer.close();
 	}
 	
-	public Rates readRates() throws IOException {
-		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
-		    @Override
-		    public LocalDate deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-		            throws JsonParseException {
-		    	String dateString = json.getAsString();
-		    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		        return LocalDate.parse(dateString, dtf);
-		    }
-		}).create();
-
-		try (Reader reader = new FileReader("rates.json")) {
-			Rates rates = gson.fromJson(reader, Rates.class);
-			if (rates.getDate().isBefore(LocalDate.now())) {
-				getLastRates();
-	            return readRates();
-			}
-			return rates;
-		} catch (IOException e) {
-            getLastRates();
-            return readRates();
-        }
-	}
-
 }

@@ -15,7 +15,9 @@ public class ConverterController {
 	private ConverterService converterService;
 	
 	@RequestMapping("/convert")
-	public Float convert(@RequestParam("currencyFrom") String currencyFrom, @RequestParam("currencyTo") String currencyTo, @RequestParam("valueFrom") Float valueFrom) {
+	public String convert(@RequestParam(name = "currencyFrom", required = true) String currencyFrom, 
+			@RequestParam(name = "currencyTo", required = true) String currencyTo, 
+			@RequestParam(name = "valueFrom", required = true) Double valueFrom) {
 		return this.converterService.convertCurrency(currencyFrom, currencyTo, valueFrom);
 	}
 
