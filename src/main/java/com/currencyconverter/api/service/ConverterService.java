@@ -9,15 +9,16 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Service;
 
 import com.currencyconverter.api.entity.Rates;
+import com.currencyconverter.api.exceptions.ConverterException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -30,35 +31,37 @@ import com.google.gson.JsonParser;
 public class ConverterService {
 	
 	private String url = "http://api.fixer.io/latest";
-	private DecimalFormat decimalFormat = new DecimalFormat("#.#####");
-	private String result;
+	private BigDecimal result;
 	
-	public String convertCurrency(String currencyFrom, String currencyTo, Double valueFrom) {
-		Rates rates = null;
-		try {
-			rates = readRates();
-		} catch (IOException e) {
-			return "Erreur d'entrée/sortie : " + e;
+	public BigDecimal convertCurrency(String currencyFrom, String currencyTo, BigDecimal valueFrom) throws ConverterException, IOException {
+		Rates rates = readRates();
+		
+		if (!rates.getRates().containsKey(currencyFrom) && !rates.getBase().equals(currencyFrom)) {
+			throw new ConverterException("Devise de départ inconnue.");
 		}
 		
-		if (valueFrom <= 0) {
-			return "La valeur de départ doit être supérieure à zéro.";
+		if (!rates.getRates().containsKey(currencyTo) && !rates.getBase().equals(currencyTo)) {
+			throw new ConverterException("Devise d'arrivée inconnue.");
+		}
+		
+		if (valueFrom.doubleValue() <= 0) {
+			throw new ConverterException("La valeur de départ doit être supérieure à zéro.");
 		}
 		
 		if (currencyFrom.equals(currencyTo)) {
-			return "La devise de départ doit être différente de la devise d'arrivée.";
+			throw new ConverterException("La devise de départ doit être différente de la devise d'arrivée.");
 		}
 		
 		if (currencyFrom.equals(rates.getBase())) {
-			result = decimalFormat.format(valueFrom * rates.getRates().get(currencyTo));
+			result = valueFrom.multiply(rates.getRates().get(currencyTo));
 		}
 		
 		if (currencyTo.equals(rates.getBase())) {
-			result = decimalFormat.format(valueFrom / rates.getRates().get(currencyFrom));
+			result = valueFrom.divide(rates.getRates().get(currencyFrom));
 		}
 		
 		if (!currencyTo.equals(rates.getBase()) && !currencyFrom.equals(rates.getBase())) {
-			result = decimalFormat.format(valueFrom * (rates.getRates().get(currencyTo) / rates.getRates().get(currencyFrom)));
+			result = valueFrom.multiply((rates.getRates().get(currencyTo).multiply(rates.getRates().get(currencyFrom))));
 		}
 		
 		return result;
