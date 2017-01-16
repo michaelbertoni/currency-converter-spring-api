@@ -1,33 +1,43 @@
 package com.currencyconverter.api.entity;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class CustomExchangeRate implements Serializable {
+import org.springframework.data.annotation.Id;
 
-	private static final long serialVersionUID = 6099307368366148445L;
+public class CustomExchangeRate {
+	
+	@Id
+	private String id;
 
-	private String baseCurrency;
-	private String termCurrency;
+	private String baseCurrencyCode;
+	private String termCurrencyCode;
 	private BigDecimal rate;
 	
 	private LocalDate lastUpdate;
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getBaseCurrency() {
-		return baseCurrency;
+		return baseCurrencyCode;
 	}
 
 	public void setBaseCurrency(String baseCurrency) {
-		this.baseCurrency = baseCurrency;
+		this.baseCurrencyCode = baseCurrency;
 	}
 
 	public String getTermCurrency() {
-		return termCurrency;
+		return termCurrencyCode;
 	}
 
 	public void setTermCurrency(String termCurrency) {
-		this.termCurrency = termCurrency;
+		this.termCurrencyCode = termCurrency;
 	}
 
 	public BigDecimal getRate() {
@@ -50,8 +60,8 @@ public class CustomExchangeRate implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((baseCurrency == null) ? 0 : baseCurrency.hashCode());
-		result = prime * result + ((termCurrency == null) ? 0 : termCurrency.hashCode());
+		result = prime * result + ((baseCurrencyCode == null) ? 0 : baseCurrencyCode.hashCode());
+		result = prime * result + ((termCurrencyCode == null) ? 0 : termCurrencyCode.hashCode());
 		return result;
 	}
 
@@ -64,29 +74,17 @@ public class CustomExchangeRate implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		CustomExchangeRate other = (CustomExchangeRate) obj;
-		if (baseCurrency == null) {
-			if (other.baseCurrency != null)
+		if (baseCurrencyCode == null) {
+			if (other.baseCurrencyCode != null)
 				return false;
-		} else if (!baseCurrency.equals(other.baseCurrency))
+		} else if (!baseCurrencyCode.equals(other.baseCurrencyCode))
 			return false;
-		if (termCurrency == null) {
-			if (other.termCurrency != null)
+		if (termCurrencyCode == null) {
+			if (other.termCurrencyCode != null)
 				return false;
-		} else if (!termCurrency.equals(other.termCurrency))
+		} else if (!termCurrencyCode.equals(other.termCurrencyCode))
 			return false;
 		return true;
-	}
-
-	public CustomExchangeRate(String baseCurrency, String termCurrency, BigDecimal rate, LocalDate lastUpdate) {
-		super();
-		this.baseCurrency = baseCurrency;
-		this.termCurrency = termCurrency;
-		this.rate = rate;
-		this.lastUpdate = lastUpdate;
-	}
-	
-	public CustomExchangeRate() {
-		
 	}
 	
 }

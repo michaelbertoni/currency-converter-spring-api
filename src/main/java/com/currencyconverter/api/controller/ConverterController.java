@@ -2,9 +2,9 @@ package com.currencyconverter.api.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.inject.Inject;
-import javax.money.UnknownCurrencyException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,31 +14,57 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.currencyconverter.api.entity.Conversion;
+import com.currencyconverter.api.entity.Currency;
+import com.currencyconverter.api.entity.CustomExchangeRate;
 import com.currencyconverter.api.entity.ErrorResponse;
-import com.currencyconverter.api.service.ConverterService;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.currencyconverter.api.exception.CurrencyNotFoundException;
+import com.currencyconverter.api.exception.FixerIoServerException;
+import com.currencyconverter.api.service.CurrencyService;
+import com.currencyconverter.api.service.CustomExchangeRateService;
 
 @RestController
 public class ConverterController {
 
 	@Inject
-	private ConverterService converterService;
+	private CustomExchangeRateService converterService;
+
+	@Inject
+	private CurrencyService currencyService;
 
 	@RequestMapping("/convert")
 	public Conversion convert(@RequestParam(name = "currencyFrom", required = true) String currencyFrom,
 			@RequestParam(name = "currencyTo", required = true) String currencyTo,
 			@RequestParam(name = "valueFrom", required = true) BigDecimal valueFrom)
-			throws JsonGenerationException, JsonMappingException, IOException {
+			throws IOException, FixerIoServerException, CurrencyNotFoundException {
 		return this.converterService.convert(currencyFrom, currencyTo, valueFrom);
 	}
 
-	@ExceptionHandler(UnknownCurrencyException.class)
-	public ResponseEntity<ErrorResponse> unknownCurrencyExceptiontionHandler(Exception ex) {
+	@RequestMapping("/refreshRates")
+	public List<CustomExchangeRate> refreshRates(
+			@RequestParam(name = "baseCurrencyCode", required = true) String baseCurrencyCode)
+			throws FixerIoServerException {
+		return this.converterService.refreshRates(baseCurrencyCode);
+	}
+
+	@RequestMapping("/getAllCurrencies")
+	public List<Currency> getAllCurrencies() {
+		return this.currencyService.findAllCurrencies();
+	}
+
+	@ExceptionHandler(CurrencyNotFoundException.class)
+	public ResponseEntity<ErrorResponse> currencyNotFoundException(Exception ex) {
 		ErrorResponse error = new ErrorResponse();
 		error.setErrorCode(HttpStatus.NOT_FOUND.value());
 		error.setMessage(ex.getMessage());
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(FixerIoServerException.class)
+	public ResponseEntity<ErrorResponse> fixerIoServerExceptionHandler(Exception ex) {
+		ErrorResponse error = new ErrorResponse();
+		error.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+		error.setMessage(ex.getMessage());
+		return new ResponseEntity<ErrorResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@ExceptionHandler(NumberFormatException.class)
