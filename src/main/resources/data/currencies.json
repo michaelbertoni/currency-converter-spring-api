@@ -1,0 +1,130 @@
+[
+  {
+    "code": "AUD",
+    "libelle": "Dollar australien"
+  },
+  {
+    "code": "BGN",
+    "libelle": "Lev bulgare"
+  },
+  {
+    "code": "BRL",
+    "libelle": "Real brésilien"
+  },
+  {
+    "code": "CAD",
+    "libelle": "Dollar canadien"
+  },
+  {
+    "code": "CHF",
+    "libelle": "Franc suisse"
+  },
+  {
+    "code": "CNY",
+    "libelle": "Yuan ou Renminbi chinois"
+  },
+  {
+    "code": "CZK",
+    "libelle": "Couronne tchèque"
+  },
+  {
+    "code": "DKK",
+    "libelle": "Couronne danoise"
+  },
+  {
+    "code": "EUR",
+    "libelle": "Euro"
+  },
+  {
+    "code": "GBP",
+    "libelle": "Livre sterling"
+  },
+  {
+    "code": "HKD",
+    "libelle": "Dollar de Hong Kong"
+  },
+  {
+    "code": "HRK",
+    "libelle": "Kuna croate"
+  },
+  {
+    "code": "HUF",
+    "libelle": "Florin hongrois"
+  },
+  {
+    "code": "IDR",
+    "libelle": "Roupie indonésienne"
+  },
+  {
+    "code": "ILS",
+    "libelle": "Nouveau shekel israélien"
+  },
+  {
+    "code": "INR",
+    "libelle": "Roupie indienne"
+  },
+  {
+    "code": "JPY",
+    "libelle": "Yen japonais"
+  },
+  {
+    "code": "KRW",
+    "libelle": "Won sud-coréen"
+  },
+  {
+    "code": "MXN",
+    "libelle": "Peso mexicain"
+  },
+  {
+    "code": "MYR",
+    "libelle": "Ringgit malais"
+  },
+  {
+    "code": "NOK",
+    "libelle": "Couronne norvégienne"
+  },
+  {
+    "code": "NZD",
+    "libelle": "Dollar néo-zélandais"
+  },
+  {
+    "code": "PHP",
+    "libelle": "Peso philippin"
+  },
+  {
+    "code": "PLN",
+    "libelle": "Zloty polonais"
+  },
+  {
+    "code": "RON",
+    "libelle": "Leu roumain"
+  },
+  {
+    "code": "RUB",
+    "libelle": "Rouble russe"
+  },
+  {
+    "code": "SEK",
+    "libelle": "Couronne suédoise"
+  },
+  {
+    "code": "SGD",
+    "libelle": "Dollar de Singapour"
+  },
+  {
+    "code": "THB",
+    "libelle": "Baht thaïlandais"
+  },
+  {
+    "code": "TRY",
+    "libelle": "Livre turque"
+  },
+  {
+    "code": "USD",
+    "libelle": "Dollar américain"
+  },
+  {
+    "code": "ZAR",
+    "libelle": "Rand sud-africain"
+  }
+]
