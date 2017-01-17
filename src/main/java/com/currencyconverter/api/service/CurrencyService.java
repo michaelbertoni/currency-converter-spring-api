@@ -26,7 +26,7 @@ public class CurrencyService {
 	private static final Type REVIEW_TYPE = new TypeToken<List<Currency>>() {}.getType();
 	
 	public List<Currency> findAllCurrencies() {
-		return this.currencyRepository.findAll();
+		return this.currencyRepository.findByOrderByCodeAsc();
 	}
 	
 	@PostConstruct
