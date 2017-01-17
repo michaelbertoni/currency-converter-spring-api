@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" /> 
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Convertisseur de devises</title>
+        <style>
+        .margin{
+            margin: 5px 5px 5px 5px;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <div class="page-header">
+                <h1>Convertisseur de devise <small>backend : Spring Boot</small></h1>
+            </div>
+
+            <form id="currencyConverterForm">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <select id="currencyFrom" name="currencyFrom" class="form-control margin">
+                                <option selected disabled>Choose here</option>
+                            </select>
+                            <input type="number" class="form-control margin" id="valueFrom" name="valueFrom"/>
+                        </div>
+                    </div>
+                
+                    <div class="col-xs-6">
+                        <div class="form-group">
+                            <select id="currencyTo" name="currencyTo" class="form-control margin">
+                                <option selected disabled>Choose here</option>
+                            </select>
+                            <div class="form-control margin" id="valueTo"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 text-center">
+                        <button class="btn btn-default margin" type="submit">Convertir !</button>
+                    </div>
+                </div>
+            </form>
+            <div class="row">
+                <div class="col-xs-12 text-center">
+                    <button class="btn btn-default margin" type="button" id="inverser">Inverser les devises</button>
+                    <button class="btn btn-default margin" type="button" id="majTaux">Mettre à jour les taux</button>
+                    <div class="margin" id="majTauxResult"></div>
+                </div>
+            </div>
+                
+        </div>
+    </body>
+
+    <script>
+        $(document).ready(function () {
+            $("#majTauxResult").hide();
+
+            jQuery.getJSON("/getAllCurrencies", function(data) {
+                console.log(data);
+                var listitems;
+                $.each(data, function(index, element){
+                    listitems += '<option value=' + element.code + '>' + element.code + " - " + element.libelle + '</option>';
+                });
+                $("#currencyFrom").append(listitems);
+                $("#currencyTo").append(listitems);
+            });
+            
+            $("#currencyConverterForm").submit(function (e){
+            	e.preventDefault();
+                jQuery.ajax({
+                    data: $("#currencyConverterForm").serialize(),
+                    url : "/convert"
+                }).done(function (data){
+                    $("#valueTo").html(data.amountTo);
+                });
+            });
+
+            $("#majTaux").click(function (){
+                jQuery.ajax({
+                    data : { "baseCurrencyCode": $("#currencyFrom").val() },
+                    url : "/refreshRates"
+                }).done(function (data){
+                    $("#majTauxResult").html("Taux mis à jour");
+                    $("#majTauxResult").show();
+                    setTimeout(function() { $("#majTauxResult").hide() }, 5000);
+                });
+            });
+
+            $("#inverser").click(function (){
+                var from = $("#currencyFrom").val();
+                var to = $("#currencyTo").val();
+                $("#currencyFrom").val(to);
+                $("#currencyTo").val(from);
+            });
+        });
+    </script>
+</html>
