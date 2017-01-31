@@ -2,6 +2,11 @@ package com.currencyconverter.api.entity;
 
 import java.math.BigDecimal;
 
+/**
+ * Entité résultat renvoyée lors de l'appel à l'API convert
+ * @author micha
+ *
+ */
 public class Conversion {
 
 	private String currencyFrom;

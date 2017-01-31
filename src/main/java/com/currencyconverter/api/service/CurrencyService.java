@@ -29,6 +29,10 @@ public class CurrencyService {
 		return this.currencyRepository.findByOrderByCodeAsc();
 	}
 	
+	/**
+	 * Chargement au lancement de l'application des devises depuis le fichier currencies.json dans la base
+	 * @throws FileNotFoundException
+	 */
 	@PostConstruct
 	public void loadData() throws FileNotFoundException {
 		ClassLoader classLoader = getClass().getClassLoader();

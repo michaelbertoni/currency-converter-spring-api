@@ -31,6 +31,17 @@ public class ConverterController {
 	@Inject
 	private CurrencyService currencyService;
 
+	/**
+	 * API principale : convertir le montant @valueFrom d'une devise @currencyFrom vers une devise @currencyTo
+	 * Retourne l'objet résultat Conversion
+	 * @param currencyFrom
+	 * @param currencyTo
+	 * @param valueFrom
+	 * @return
+	 * @throws IOException
+	 * @throws FixerIoServerException
+	 * @throws CurrencyNotFoundException
+	 */
 	@RequestMapping("/convert")
 	public Conversion convert(@RequestParam(name = "currencyFrom", required = true) String currencyFrom,
 			@RequestParam(name = "currencyTo", required = true) String currencyTo,
@@ -39,6 +50,12 @@ public class ConverterController {
 		return this.converterService.convert(currencyFrom, currencyTo, valueFrom);
 	}
 
+	/**
+	 * Mise à jour de tous les taux de conversion à partir d'une devise de base @baseCurrencyCode
+	 * @param baseCurrencyCode
+	 * @return
+	 * @throws FixerIoServerException
+	 */
 	@RequestMapping("/refreshRates")
 	public List<CustomExchangeRate> refreshRates(
 			@RequestParam(name = "baseCurrencyCode", required = true) String baseCurrencyCode)
@@ -46,11 +63,20 @@ public class ConverterController {
 		return this.converterService.refreshRates(baseCurrencyCode);
 	}
 
+	/**
+	 * Retourne la liste de toutes les devises en base
+	 * @return
+	 */
 	@RequestMapping("/getAllCurrencies")
 	public List<Currency> getAllCurrencies() {
 		return this.currencyService.findAllCurrencies();
 	}
 
+	/**
+	 * Erreur liée à l'API convert : devise introuvable en base
+	 * @param ex
+	 * @return
+	 */
 	@ExceptionHandler(CurrencyNotFoundException.class)
 	public ResponseEntity<ErrorResponse> currencyNotFoundException(Exception ex) {
 		ErrorResponse error = new ErrorResponse();
@@ -59,6 +85,11 @@ public class ConverterController {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.NOT_FOUND);
 	}
 	
+	/**
+	 * Erreur liée à l'API convert et refreshRates : l'appel à l'API externe Fixer.io renvoie une erreur
+	 * @param ex
+	 * @return
+	 */
 	@ExceptionHandler(FixerIoServerException.class)
 	public ResponseEntity<ErrorResponse> fixerIoServerExceptionHandler(Exception ex) {
 		ErrorResponse error = new ErrorResponse();
@@ -67,6 +98,11 @@ public class ConverterController {
 		return new ResponseEntity<ErrorResponse>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * Erreur liée à l'API convert : format incorrect du montant à convertir
+	 * @param ex
+	 * @return
+	 */
 	@ExceptionHandler(NumberFormatException.class)
 	public ResponseEntity<ErrorResponse> numberFormatExceptionHandler(Exception ex) {
 		ErrorResponse error = new ErrorResponse();

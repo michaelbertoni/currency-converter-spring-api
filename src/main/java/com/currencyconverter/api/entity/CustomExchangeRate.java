@@ -5,6 +5,11 @@ import java.time.LocalDate;
 
 import org.springframework.data.annotation.Id;
 
+/**
+ * Taux de change entre deux devises
+ * @author michael
+ *
+ */
 public class CustomExchangeRate {
 	
 	@Id

@@ -2,6 +2,11 @@ package com.currencyconverter.api.entity;
 
 import org.springframework.data.annotation.Id;
 
+/**
+ * Devise
+ * @author michael
+ *
+ */
 public class Currency {
 	
 	@Id
